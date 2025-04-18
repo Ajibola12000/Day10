@@ -1,0 +1,75 @@
+"""
+Root Finding Implementation using Bisection Method
+
+Demonstrates functional decomposition and modular programming principles.
+"""
+
+def find_root_bounds(x: float, power: int) -> tuple:
+    """
+    Find initial search boundaries for root finding.
+    
+    Args:
+        x: The number to find the root of
+        power: The power of the root to find (must be positive integer)
+    
+    Returns:
+        Tuple of (low, high) such that low**power <= x <= high**power
+    """
+    low = min(-1, x)
+    high = max(1, x)
+    return low, high
+
+
+def bisection_solve(x: float, power: int, epsilon: float, 
+                   low: float, high: float) -> float:
+    """
+    Find root using bisection method within given bounds.
+    
+    Args:
+        x: Target value
+        power: Power of the root
+        epsilon: Precision tolerance
+        low: Lower bound (must satisfy low**power <= x)
+        high: Upper bound (must satisfy high**power >= x)
+    
+    Returns:
+        Approximation of root such that |root**power - x| <= epsilon
+    """
+    ans = (high + low) / 2
+    while abs(ans**power - x) >= epsilon:
+        if ans**power < x:
+            low = ans
+        else:
+            high = ans
+        ans = (high + low) / 2
+    return ans
+
+
+def find_root(x: float, power: int, epsilon: float = 0.001) -> float | None:
+    """
+    Find root of a number with specified precision.
+    
+    Args:
+        x: The number to find the root of
+        power: The power of the root (must be positive integer)
+        epsilon: Precision tolerance (default: 0.001)
+    
+    Returns:
+        Approximation of root, or None if no real root exists
+    """
+    if x < 0 and power % 2 == 0:
+        return None  # Negative number has no even-powered real roots
+    low, high = find_root_bounds(x, power)
+    return bisection_solve(x, power, epsilon, low, high)
+
+
+# Example usage
+if __name__ == "__main__":
+    # Find square root of 25
+    print(f"Square root of 25: {find_root(25, 2)}")  # ~5.0
+    
+    # Find cube root of -27
+    print(f"Cube root of -27: {find_root(-27, 3)}")  # ~-3.0
+    
+    # Attempt to find square root of -16 (invalid)
+    print(f"Square root of -16: {find_root(-16, 2)}")  # None
